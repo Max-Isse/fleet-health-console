@@ -5,7 +5,7 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.29-alpine
+FROM nginxinc/nginx-unprivileged:1.31-alpine
 # Apply Alpine security fixes released after the base image was built (Trivy gates CRITICAL ones in CI).
 USER root
 RUN apk upgrade --no-cache
