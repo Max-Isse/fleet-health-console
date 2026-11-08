@@ -1,0 +1,27 @@
+# One image for the init, producer, scorer and API services. Non-root, dependencies from the lock file only.
+FROM python:3.11-slim AS base
+COPY --from=ghcr.io/astral-sh/uv:0.11.18 /uv /bin/uv
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-dev --no-install-project
+COPY src ./src
+COPY configs ./configs
+COPY db ./db
+RUN uv sync --frozen --no-dev
+
+RUN useradd --create-home --uid 10001 fleet && mkdir -p /app/data /app/artifacts && chown -R fleet /app/data /app/artifacts
+USER fleet
+
+ENV FLEET_CONFIG_PATH=/app/configs/config.yaml \
+    FLEET_DATA_DIR=/app/data \
+    FLEET_ARTIFACTS_DIR=/app/artifacts
+
+EXPOSE 8000
+CMD ["uvicorn", "fleet.api:app", "--host", "0.0.0.0", "--port", "8000"]

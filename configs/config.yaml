@@ -1,0 +1,42 @@
+# Single source of truth for topics, model settings, risk bands and replay behaviour.
+# Connection strings and secrets are NOT here: they come from environment variables (see .env.example).
+# Values marked ASSUMPTION are operating choices, not estimates from data.
+
+seed: 20261108
+
+source:
+  # Official NASA Prognostics Center of Excellence repository, data set 6 (C-MAPSS).
+  page: https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/
+  url: https://phm-datasets.s3.amazonaws.com/NASA/6.+Turbofan+Engine+Degradation+Simulation+Data+Set.zip
+  archive_sha256: c9c5dec12a945a82e8bb4446589d7fb3cc057b5e5d81fa1a12e25ee9912ad3b2
+  inner_archive: CMAPSSData.zip
+  dataset: FD001            # one operating condition, one fault mode: keeps the model simple so the platform is the focus
+
+kafka:
+  telemetry_topic: engine-telemetry
+  dead_letter_topic: engine-telemetry.dlq
+  partitions: 6             # key = engine_id, so every engine's readings stay in order on one partition
+  consumer_group: fleet-scorer
+  poll_batch_size: 500
+  poll_timeout_s: 1.0
+
+model:
+  version: hgb-fd001-v1
+  rul_cap: 125              # standard piecewise-linear RUL target for C-MAPSS: early-life RUL is not identifiable
+  window: 10                # cycles in the rolling feature window
+  sensors: [s2, s3, s4, s7, s11, s12, s15, s17, s20, s21]   # sensors that move with degradation in FD001
+  params:
+    max_iter: 300
+    learning_rate: 0.05
+    max_leaf_nodes: 31
+    l2_regularization: 1.0
+
+risk_bands:                 # ASSUMPTION: maintenance planning thresholds in predicted remaining cycles
+  critical_below: 20
+  warning_below: 50
+
+replay:
+  ticks_per_second: 5       # one tick = every engine that has data at that cycle sends one reading
+  # SYNTHETIC fault injection, so the dead-letter queue and duplicate handling are exercised on every run
+  malformed_rate: 0.005
+  duplicate_rate: 0.01

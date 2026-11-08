@@ -1,0 +1,188 @@
+{
+  "$defs": {
+    "OperatingSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "op_setting_1": {
+          "title": "Op Setting 1",
+          "type": "number"
+        },
+        "op_setting_2": {
+          "title": "Op Setting 2",
+          "type": "number"
+        },
+        "op_setting_3": {
+          "title": "Op Setting 3",
+          "type": "number"
+        }
+      },
+      "required": [
+        "op_setting_1",
+        "op_setting_2",
+        "op_setting_3"
+      ],
+      "title": "OperatingSettings",
+      "type": "object"
+    },
+    "Sensors": {
+      "additionalProperties": false,
+      "properties": {
+        "s1": {
+          "title": "S1",
+          "type": "number"
+        },
+        "s10": {
+          "title": "S10",
+          "type": "number"
+        },
+        "s11": {
+          "title": "S11",
+          "type": "number"
+        },
+        "s12": {
+          "title": "S12",
+          "type": "number"
+        },
+        "s13": {
+          "title": "S13",
+          "type": "number"
+        },
+        "s14": {
+          "title": "S14",
+          "type": "number"
+        },
+        "s15": {
+          "title": "S15",
+          "type": "number"
+        },
+        "s16": {
+          "title": "S16",
+          "type": "number"
+        },
+        "s17": {
+          "title": "S17",
+          "type": "number"
+        },
+        "s18": {
+          "title": "S18",
+          "type": "number"
+        },
+        "s19": {
+          "title": "S19",
+          "type": "number"
+        },
+        "s2": {
+          "title": "S2",
+          "type": "number"
+        },
+        "s20": {
+          "title": "S20",
+          "type": "number"
+        },
+        "s21": {
+          "title": "S21",
+          "type": "number"
+        },
+        "s3": {
+          "title": "S3",
+          "type": "number"
+        },
+        "s4": {
+          "title": "S4",
+          "type": "number"
+        },
+        "s5": {
+          "title": "S5",
+          "type": "number"
+        },
+        "s6": {
+          "title": "S6",
+          "type": "number"
+        },
+        "s7": {
+          "title": "S7",
+          "type": "number"
+        },
+        "s8": {
+          "title": "S8",
+          "type": "number"
+        },
+        "s9": {
+          "title": "S9",
+          "type": "number"
+        }
+      },
+      "required": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "s8",
+        "s9",
+        "s10",
+        "s11",
+        "s12",
+        "s13",
+        "s14",
+        "s15",
+        "s16",
+        "s17",
+        "s18",
+        "s19",
+        "s20",
+        "s21"
+      ],
+      "title": "Sensors",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One sensor reading from one engine at one operating cycle.",
+  "properties": {
+    "cycle": {
+      "minimum": 1,
+      "title": "Cycle",
+      "type": "integer"
+    },
+    "engine_id": {
+      "minimum": 1,
+      "title": "Engine Id",
+      "type": "integer"
+    },
+    "event_id": {
+      "format": "uuid",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "produced_at": {
+      "format": "date-time",
+      "title": "Produced At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "sensors": {
+      "$ref": "#/$defs/Sensors"
+    },
+    "settings": {
+      "$ref": "#/$defs/OperatingSettings"
+    }
+  },
+  "required": [
+    "event_id",
+    "engine_id",
+    "cycle",
+    "produced_at",
+    "settings",
+    "sensors"
+  ],
+  "title": "TelemetryEvent",
+  "type": "object"
+}

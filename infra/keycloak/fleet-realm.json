@@ -1,0 +1,66 @@
+{
+  "realm": "fleet",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "accessTokenLifespan": 300,
+  "bruteForceProtected": true,
+  "roles": {
+    "realm": [
+      { "name": "viewer", "description": "Read fleet health, alerts and pipeline status" },
+      { "name": "engineer", "description": "Viewer, plus acknowledge alerts" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "fleet-web",
+      "name": "Fleet Health Console",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:3000/*", "http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:3000", "http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:5173/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "fleet-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "fleet-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "viewer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Viewer",
+      "email": "viewer@fleet.example",
+      "credentials": [{ "type": "password", "value": "viewer-demo-only", "temporary": false }],
+      "realmRoles": ["viewer"]
+    },
+    {
+      "username": "engineer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Engineer",
+      "email": "engineer@fleet.example",
+      "credentials": [{ "type": "password", "value": "engineer-demo-only", "temporary": false }],
+      "realmRoles": ["viewer", "engineer"]
+    }
+  ]
+}
