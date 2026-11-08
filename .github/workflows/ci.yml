@@ -29,8 +29,8 @@ jobs:
     env:
       FLEET_TEST_DATABASE_URL: postgresql://fleet:ci_only@localhost:5432/fleet_test
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           version: "0.11.18"
       - run: uv sync --frozen
@@ -49,8 +49,8 @@ jobs:
       run:
         working-directory: web
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -66,22 +66,15 @@ jobs:
     needs: [backend, web]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build images
         run: |
           docker build -f docker/Dockerfile.python -t fleet-health-console/python:ci .
           docker build -t fleet-health-console/web:ci web
-      - name: Scan the Python image for critical vulnerabilities
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: fleet-health-console/python:ci
-          severity: CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
-      - name: Scan the web image for critical vulnerabilities
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: fleet-health-console/web:ci
-          severity: CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+      # Trivy from its pinned official image: fails the build on any CRITICAL vulnerability that has a fix.
+      - name: Scan images for critical vulnerabilities
+        run: |
+          for image in fleet-health-console/python:ci fleet-health-console/web:ci; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.76.2 \
+              image --severity CRITICAL --ignore-unfixed --exit-code 1 --no-progress "$image"
+          done
