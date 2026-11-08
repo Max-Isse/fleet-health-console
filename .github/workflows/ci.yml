@@ -72,14 +72,14 @@ jobs:
           docker build -f docker/Dockerfile.python -t fleet-health-console/python:ci .
           docker build -t fleet-health-console/web:ci web
       - name: Scan the Python image for critical vulnerabilities
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: fleet-health-console/python:ci
           severity: CRITICAL
           ignore-unfixed: true
           exit-code: "1"
       - name: Scan the web image for critical vulnerabilities
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: fleet-health-console/web:ci
           severity: CRITICAL
